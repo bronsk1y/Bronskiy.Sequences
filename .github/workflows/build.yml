@@ -27,13 +27,13 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore Bronskiy.Sequences/Bronskiy.Sequences/Bronskiy.Sequences.csproj
 
       - name: Build & Test
-        run: dotnet test -c Release --no-restore
+        run: dotnet test Bronskiy.Sequences/Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release --no-restore
 
       - name: Pack NuGet package
-        run: dotnet pack Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release -o ./nupkgs -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+        run: dotnet pack Bronskiy.Sequences/Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release -o ./nupkgs -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
 
       - name: NuGet login (Trusted Publishing)
         id: nuget_login
@@ -42,12 +42,12 @@ jobs:
           user: Bronsk1y
 
       - name: Push to NuGet.org
-        run: dotnet nuget push artifacts/my-sdk.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ steps.nuget_login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
-            *.nupkg
-
+            ./nupkgs/*.nupkg
+            ./nupkgs/*.snupkg
