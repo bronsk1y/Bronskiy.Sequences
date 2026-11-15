@@ -80,9 +80,32 @@ namespace Bronskiy.Sequences
             var result = Enumerate(start, count, func);
             return result;
         }
+
+        /// <summary>
+        /// Generates a sequence that contains one repeated value of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="count">The number of times to repeat the value in the generated sequence.</param>
+        /// <param name="value">The value to be repeated.</param>
+        /// <returns>A lazily evaluated sequence; empty if <paramref name="count"/> is zero.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is less than zero.</exception>
+        public static IEnumerable<T> Repeat(int count, T value)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(count);
+
+            var result = Enumerate(count, value);
+            return result;
+        }
         #endregion
 
         #region Private methods
+        private static IEnumerable<T> Enumerate(int count, T value)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                yield return value;
+            }
+        }
+
         private static IEnumerable<T> Enumerate(int count, Func<T> func)
         {
             for (int i = 0; i < count; i++)
@@ -101,9 +124,17 @@ namespace Bronskiy.Sequences
 
         private static IEnumerable<T> Enumerate(Range range, Func<int, T> func)
         {
-            for (int i = range.Start.Value; i < range.End.Value; i++)
+            int start = range.Start.Value;
+            int end = range.End.Value;
+            if (start < end)
             {
-                yield return func(i);
+                for (int i = start; i < end; i++)
+                    yield return func(i);
+            }
+            else
+            {
+                for (int i = start; i > end; i--)
+                    yield return func(i);
             }
         }
 
