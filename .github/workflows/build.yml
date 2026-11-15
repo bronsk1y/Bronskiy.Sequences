@@ -36,7 +36,7 @@ jobs:
         run: dotnet test Bronskiy.Sequences.sln -c Release --no-build
 
       - name: Pack NuGet package
-        run: dotnet pack Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release --no-build -o ./nupkgs -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+        run: dotnet pack Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release -o ./nupkgs -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
 
       - name: NuGet login (Trusted Publishing)
         id: nuget_login
