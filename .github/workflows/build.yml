@@ -27,13 +27,13 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
       - name: Restore dependencies
-        run: dotnet restore Bronskiy.Sequences/Bronskiy.Sequences/Bronskiy.Sequences.csproj
+        run: dotnet restore Bronskiy.Sequences/Bronskiy.Sequences.csproj
 
       - name: Build & Test
-        run: dotnet test Bronskiy.Sequences/Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release --no-restore
+        run: dotnet test Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release --no-restore
 
       - name: Pack NuGet package
-        run: dotnet pack Bronskiy.Sequences/Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release -o ./nupkgs -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+        run: dotnet pack Bronskiy.Sequences/Bronskiy.Sequences.csproj -c Release -o ./nupkgs -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
 
       - name: NuGet login (Trusted Publishing)
         id: nuget_login
