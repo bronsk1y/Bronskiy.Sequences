@@ -64,6 +64,30 @@ namespace Bronskiy.Sequences
         }
 
         /// <summary>
+        /// Generates a sequence by computing values for indices in the specified range using the given step.
+        /// </summary>
+        /// <param name="range">The range of indices to generate values for. The start is inclusive and the end is exclusive; endpoints are treated as absolute zero-based indices.</param>
+        /// <param name="step">The increment between indices. A positive step generates increasing indices; a negative step generates decreasing indices.</param>
+        /// <param name="func">The function that creates a value from an index.</param>
+        /// <returns>A lazily evaluated sequence; it is empty if the step moves away from the range's end.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">An endpoint of <paramref name="range"/> is less than zero, or <paramref name="step"/> is zero.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        public static IEnumerable<T> Generate(Range range, int step, Func<int, T> func)
+        {
+            int start = range.Start.Value;
+            int end = range.End.Value;
+
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            ArgumentOutOfRangeException.ThrowIfNegative(end);
+            ArgumentOutOfRangeException.ThrowIfZero(step);
+            ArgumentNullException.ThrowIfNull(func);
+
+            var result = Enumerate(range, step, func);
+            return result;
+        }
+
+
+        /// <summary>
         /// Generates a sequence of <paramref name="count"/> elements by computing values for sequential indices starting from <paramref name="start"/>.
         /// </summary>
         /// <param name="start">The value of the first integer index in the sequence.</param>
@@ -78,6 +102,26 @@ namespace Bronskiy.Sequences
             ArgumentNullException.ThrowIfNull(func);
 
             var result = Enumerate(start, count, func);
+            return result;
+        }
+
+        /// <summary>
+        /// Generates a sequence of values for a specified number of indices, starting at <paramref name="start"/> and advancing by <paramref name="step"/>.
+        /// </summary>
+        /// <param name="start">The value of the first integer index in the sequence.</param>
+        /// <param name="count">The number of values to generate.</param>
+        /// <param name="step">The increment between indices; may be positive or negative, but not zero.</param>
+        /// <param name="func">The function that creates a value from an index.</param>
+        /// <returns>A lazily evaluated sequence; it is empty if <paramref name="count"/> is less than or equal to zero.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> is less than zero, or <paramref name="step"/> is zero.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        public static IEnumerable<T> Generate(int start, int count, int step, Func<int, T> func)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            ArgumentOutOfRangeException.ThrowIfZero(step);
+            ArgumentNullException.ThrowIfNull(func);
+
+            var result = Enumerate(start, count, step, func);
             return result;
         }
 
@@ -138,6 +182,24 @@ namespace Bronskiy.Sequences
             }
         }
 
+        private static IEnumerable<T> Enumerate(Range range, int step, Func<int, T> func)
+        {
+            long start = range.Start.Value;
+            long end = range.End.Value;
+
+            if (step > 0)
+            {
+                for (long i = start; i < end; i += step)              
+                    yield return func((int)i);
+               
+            }
+            else
+            {
+                for (long i = start; i > end; i += step)                
+                    yield return func((int)i);              
+            }
+        }
+
         private static IEnumerable<T> Enumerate(int start, int count, Func<int, T> func)
         {
             for (int i = 0; i < count; i++)
@@ -145,6 +207,27 @@ namespace Bronskiy.Sequences
                 yield return func(i + start);
             }
         }
+
+        private static IEnumerable<T> Enumerate(int start, int count, int step, Func<int, T> func)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                long value = (long)i * step + start;
+                yield return func((int)value);
+            }
+        }
         #endregion
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var sequence = Sequence<int>.Generate(0, 1, 0, x => x);
+            foreach (var item in sequence)
+            {
+                Console.WriteLine(item);
+            }
+        }
     }
 }
