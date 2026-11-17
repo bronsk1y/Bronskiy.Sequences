@@ -9,51 +9,35 @@ This library provides a generator, that generates lazily evaluated sequences fro
 
 ## How to Use
 
+Generate values from their zero-based index:
+
 ```csharp
-using System;
-using System.Collections.Generic;
-using Bronskiy.Sequences;
-
-IEnumerable<int> squares = Sequence<int>.Generate(
-    count: 5,
-    func: index => index * index);
-
-foreach (int square in squares)
-{
-    Console.WriteLine(square);
-}
+IEnumerable<int> squares = Sequence<int>.Generate(5, index => index * index);
 ```
 
-Generation without an index:
+Generate values without an index:
 
 ```csharp
-IEnumerable<Guid> ids = Sequence<Guid>.Generate(
-    count: 3,
-    func: Guid.NewGuid);
+IEnumerable<Guid> ids = Sequence<Guid>.Generate(3, Guid.NewGuid);
 ```
 
-Generation with a specified index:
+Generate values from a starting index with a step:
 
 ```csharp
-IEnumerable<int> values = Sequence<int>.Generate(
-    start: 10,
-    count: 3,
-    func: index => index);
+IEnumerable<int> oddNumbers = Sequence<int>.Generate(1, 5, 2, index => index);
 ```
 
-Generation with a Range:
+Generate values over a range with a negative step:
 
 ```csharp
-IEnumerable<int> values = Sequence<int>.Generate(
-    range: new Range(2, 5),
-    func: index => index);
+IEnumerable<int> descending = Sequence<int>.Generate(new Range(5, 0), -1, index => index);
 ```
 
 ## Main Types
 
 The main type is:
 
-- **`Sequence<T>`** — provides methods for generating sequences of `T`.
+- **`Sequence<T>`**
 
 ## Feedback & Contributing
 
